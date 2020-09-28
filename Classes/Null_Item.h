@@ -1,9 +1,9 @@
 /*
 *     AUTHOR: ERIK ALMAGUER
 *     FILE: Null_Item.h
-*     Description:
-*
-*
+*     Description: The Null_Item class exists to support 
+*     the Null Object pattern to avoid unnexpected null 
+*     values that could potentially cause issues.
 *
 */
 

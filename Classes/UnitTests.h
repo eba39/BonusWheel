@@ -1,9 +1,9 @@
 /*
 *     AUTHOR: ERIK ALMAGUER
 *     FILE: UnitTests.h
-*     Description:
-*
-*
+*     Description: The UnitTests class holds all of functions
+*     for the user to test the app during run time.
+*     Output is shown in the console.
 *
 */
 
@@ -46,6 +46,7 @@ public:
     //test ItemDrop creation with NULL inputs
     static void createInvalidItem();
 
+	//this function was used as a placeholder for menu creation
     static void underConstruction(float dt);
 
 

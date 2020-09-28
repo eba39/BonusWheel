@@ -18,7 +18,7 @@ USING_NS_CC;
 Wheel::Wheel(std::string WheelImage, std::string Wheel_arrow, std::string Wheel_frame, vector<ItemDrop*> itemList, int item_radius){
 
     this->Arrow = Sprite::create(Wheel_arrow);
-    //this->Frame = Sprite::create(Wheel_frame);
+   
     this->theWheel = Sprite::create(WheelImage);
     this->initWithFile(Wheel_frame);
     this->addChild(this->Arrow);
@@ -29,6 +29,7 @@ Wheel::Wheel(std::string WheelImage, std::string Wheel_arrow, std::string Wheel_
     this->ItemDropList = itemList;
     this->NumberOfSectors = itemList.size();
     this->ItemRadius = item_radius;
+	//Null_Item is added to the back of list doesn't add an additional sector.
     this->ItemDropList.push_back(new Null_Item());
 }
 
@@ -74,7 +75,7 @@ void Wheel::setCurrentSector(int s) {
     }
 }
 
-
+//this function handles complete animation for the wheel
 ItemDrop* Wheel::AnimateWheel(){
 
     float sectorSize = 360.0/this->getNumberOfSectors();
@@ -87,7 +88,10 @@ ItemDrop* Wheel::AnimateWheel(){
 
     //reset wheel position before animating
     this->setRotation(0.0);
-
+	
+	//Animation are created by using 5 different RotateBy actions to make will spin at varying speeds.
+	//However this makes movement very jerky on screen.
+	//I think a more elegant solution can be found by using the cocos2d Physics objects
     auto startSpin = RotateBy::create(1.0,360);
     auto slowSpin = RotateBy::create(1.75, 360);
     float spinTime = (rotation*2)/150.0;
@@ -96,7 +100,7 @@ ItemDrop* Wheel::AnimateWheel(){
     auto revBounce = RotateBy::create(0.4, -WHEEL_BOUNCE_END);
 
     auto fadeWheelOut = CallFunc::create([this]() {
-
+		//FadeOut actions are given to each item except for the "prize" item so that it can be shown on screen.
         ItemDrop* prize = this->getItem(this->getCurrentSector());
 
         auto fadeAction = FadeOut::create(0.5);
@@ -133,15 +137,21 @@ int Wheel::getCurrentSector() {
 
 ItemDrop *Wheel::getItem(int Sector) {
 
+	//if sector is out of bounds, the Null_Item will be returned
     if(Sector >= this->ItemDropList.size()-1 || Sector < 0)
         return this->ItemDropList[this->ItemDropList.size()-1];
 
     return this->ItemDropList[Sector];
 }
 
+//this function is called when player presses play button.
+//A boolean value is passed to decided if animation is played or not
+//when testing 1000 spins, a false value is passed to skip all animations
 ItemDrop *Wheel::spin(bool playAnimation) {
     int sector = -1;
 
+	//total item drop rates are added to implement dynamic wheel sizes
+	//total is used to get a random value between 1 and total
     int total = 0;
     for(ItemDrop* item : this->ItemDropList){
         total += item->getDropRate();
@@ -149,7 +159,10 @@ ItemDrop *Wheel::spin(bool playAnimation) {
 
     int rand = cocos2d::RandomHelper::random_int(1, total);
     total = 0;
-
+	
+	//This loop adds drop rates until a middle value is found.
+	//Which ever item's drop rate breaks the loop, is the item that the player wins
+	//This loop allows for varying numbers of items/sectors per wheel.
     for(ItemDrop* item : this->ItemDropList){
         sector++;
         int lower = total;

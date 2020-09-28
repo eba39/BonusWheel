@@ -1,7 +1,7 @@
 /*
 *     AUTHOR: ERIK ALMAGUER
 *     FILE: Definitions.h
-*     Description:
+*     Description: This file contains definitions for regularly used, or values that should be const.
 *
 *
 *

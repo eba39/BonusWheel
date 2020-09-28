@@ -1,9 +1,12 @@
 /*
 *     AUTHOR: ERIK ALMAGUER
 *     FILE: ItemDrop.h
-*     Description:
-*
-*
+*     Description: This is the base abstract class for all items.
+*     An ItemDrop cannot be created directly, instead a new class
+*     must be defined and inherit from the ItemDrop to be used.
+*     The developer is required to define the use method. 
+*     ItemDrop inherits from the cocos2d::Sprite class to give Item objects
+*     a "physical" form on screen.
 *
 */
 

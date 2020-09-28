@@ -1,7 +1,7 @@
 /*
 *     AUTHOR: ERIK ALMAGUER
 *     FILE: GameScene.h
-*     Description:
+*     Description: This class holds the code for the main scene of the game.
 *
 *
 *

@@ -15,9 +15,12 @@ USING_NS_CC;
 
 
 
-
+/*this function will create a menu item for each test that is defined
+	each test is added to the menu by creating a MenuItemLabel with a 
+	callback to each test
+*/
 cocos2d::Menu *UnitTests::createMenu(Wheel *theWheel) {
-    //theWheel = w;
+
     Menu* UnitTestMenu = Menu::create();
     auto visibleSize = Director::getInstance()->getVisibleSize();
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
@@ -33,16 +36,17 @@ cocos2d::Menu *UnitTests::createMenu(Wheel *theWheel) {
     buttonList.push_back( MenuItemLabel::create(txtObj, CC_CALLBACK_0(UnitTests::testItemCreation, theWheel )) );
     txtObj = ( Label::createWithTTF("Test no items", DEF_FONT, 16) );
     buttonList.push_back( MenuItemLabel::create(txtObj, CC_CALLBACK_0(UnitTests::testNoItems, theWheel )) );
-    /*txtObj = ( Label::createWithTTF("Test sector 0", DEF_FONT, 16) );
-    buttonList.push_back( MenuItemLabel::create(txtObj, CC_CALLBACK_0(UnitTests::testSectorInput, theWheel, 0 )) );*/
 
+
+	//Menu items for each sector that exists on the wheel are created dynamically.
     for(int i = 0; i < theWheel->getNumberOfSectors(); i++){
         std::string sectorText = "Test sector ";
         sectorText += to_string(i) + ":" + theWheel->getItem(i)->getName() + "X" + to_string(theWheel->getItem(i)->getCount());
         txtObj = ( Label::createWithTTF(sectorText, DEF_FONT, 16) );
         buttonList.push_back( MenuItemLabel::create(txtObj, CC_CALLBACK_0(UnitTests::testSectorInput, theWheel, i )) );
     }
-
+	
+	//positioning and color added to improve visibility of menu
     DrawNode* box;
     int spacing = 23;
     int count = 0;

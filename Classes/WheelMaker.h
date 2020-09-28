@@ -1,7 +1,8 @@
 /*
 *     AUTHOR: ERIK ALMAGUER
 *     FILE: WheelMaker.h
-*     Description:
+*     Description: This is a "helper" or "construction" class/object for
+*     the creation of wheel and items. 
 *
 *
 *

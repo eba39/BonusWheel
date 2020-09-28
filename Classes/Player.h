@@ -1,10 +1,11 @@
 /*
 *     AUTHOR: ERIK ALMAGUER
 *     FILE: Player.h
-*     Description:
-*
-*
-*
+*     Description: The Player class exists to hold the total values
+*     of the items collected. Items are added by calling the Player's
+*     corresponding addX function and passing an int value to add.
+*     Items may also be taken this way by passing a negative value to
+*     these same functions.
 */
 
 

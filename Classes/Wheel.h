@@ -1,9 +1,9 @@
 /*
 *     AUTHOR: ERIK ALMAGUER
 *     FILE: Wheel.h
-*     Description:
-*
-*
+*     Description: This class holds all of the functionality for the
+*     the wheel seen on screen. This includes animations and game behaviors.
+*     
 *
 */
 
