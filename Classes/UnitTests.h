@@ -11,7 +11,7 @@
 #define __UNIT_TESTS_H__
 
 #include "cocos2d.h"
-#include "WheelMaker.h"
+#include "Wheel.h"
 
 #define LOG_TAG2 "helloworld"
 #define LOGGER(...)  __android_log_print(ANDROID_LOG_DEBUG,LOG_TAG2,__VA_ARGS__)
@@ -43,11 +43,11 @@ public:
     //tests game with no items
     static void testNoItems(Wheel* theWheel);
 
-    //test ItemDrop creation with NULL inputs
-    static void createInvalidItem();
+    //will output text to a layer and format automatically
+    static void showLog(vector<string> output_to_screen, Scene* screen);
 
-	//this function was used as a placeholder for menu creation
-    static void underConstruction(float dt);
+    //call back function for on-screen log items
+    static void killLog(Scene* screen);
 
 
 };

@@ -8,30 +8,33 @@
 */
 
 #include"ItemDrop.h"
+#include "Definitions.h"
 
 
 
 ItemDrop::ItemDrop(std::string NameOfItem, int NumberOfItem, const string& ImageFile, double DropChance) {
-	this->Name = NameOfItem;
-	this->Count = NumberOfItem;
-	this->DropRate = DropChance;
-	this->initWithFile(ImageFile);
-	this->setCascadeOpacityEnabled(true);
+	//this->Name = NameOfItem;
 
-	string text = "x";
-	text += std::to_string(NumberOfItem);
+	//this will ensure that the Sprite::init function gets called.
+	if( this->initWithFile(ImageFile) ) {
 
-	cocos2d::Label* label = cocos2d::Label::createWithTTF(text, "fonts/Marker Felt.ttf", 16);
-	this->addChild(label);
+		this->setName(NameOfItem);
+		this->Count = NumberOfItem;
+		this->DropRate = DropChance;
+		this->setCascadeOpacityEnabled(true);
 
-	label->setPositionX( label->getPositionX() + 20 );
-	label->enableOutline(cocos2d::Color4B::ORANGE, 1);
+		string text = "x";
+		text += std::to_string(NumberOfItem);
+
+		cocos2d::Label *label = cocos2d::Label::createWithTTF(text, "fonts/Marker Felt.ttf", 16);
+		this->addChild(label);
+
+		label->setPositionX(label->getPositionX() + 20);
+		label->enableOutline(cocos2d::Color4B::ORANGE, 1);
+	}
 
 }
-	
-std::string ItemDrop::getName() {
-	return this->Name;
-}
+
 
 int ItemDrop::getCount() {
 	return this->Count;
@@ -51,6 +54,25 @@ void ItemDrop::AnimateItem(cocos2d::Vec2 location) {
 
 }
 
-void ItemDrop::FadeOut(float duration) {
-	this->runAction( cocos2d::FadeOut::create(duration) );
+
+ItemDrop *ItemDrop::createGems(int amount, double chance) {
+	return new ItemDrop("Gems", amount, IMG_GEM, chance);
 }
+
+ItemDrop *ItemDrop::createHammers(int amount, double chance) {
+	return new ItemDrop("Hammers", amount, IMG_HAMMER, chance);
+}
+
+ItemDrop *ItemDrop::createLife(int amount, double chance) {
+	return new ItemDrop("Life", amount, IMG_HEART, chance);
+}
+
+ItemDrop *ItemDrop::createCoins(int amount, double chance) {
+	return new ItemDrop("Coins", amount, IMG_COIN, chance);
+}
+
+ItemDrop *ItemDrop::createBrushes(int amount, double chance) {
+	return new ItemDrop("Brushes", amount, IMG_BRUSH, chance);
+}
+
+

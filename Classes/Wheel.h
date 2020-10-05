@@ -11,27 +11,34 @@
 #define __WHEEL_H__
 
 #include "cocos2d.h"
-#include "Null_Item.h"
+#include "ItemDrop.h"
 #include "Definitions.h"
 #include <vector>
+
+USING_NS_CC;
 
 //wheel class
 class Wheel: public cocos2d::Sprite
 {
 
 private:
+
     int NumberOfSectors;
     int ItemRadius;
-    vector<ItemDrop*> ItemDropList;
     int currentSector;
+
+    vector<ItemDrop*> ItemDropList;
+
     Sprite* Arrow;
-    Sprite* Frame;
     Sprite* theWheel;
+
+    static double calculateSectorRotation(Wheel* theWheel, int sector);
+    static void placeItemsAroundWheel(Wheel* theWheel);
 
 public:
 
-    Wheel();
     Wheel(std::string WheelImage, std::string Wheel_arrow, std::string Wheel_frame, vector<ItemDrop*> itemList, int item_radius);
+    static Wheel* createWheel(vector<ItemDrop*> ItemList);
 
     //setters
     void setNumberOfSectors(int numOfSectors);
@@ -52,7 +59,6 @@ public:
     //function
     ItemDrop* AnimateWheel();
     ItemDrop* spin(bool playAnimation);
-
 
 };
 

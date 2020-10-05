@@ -42,7 +42,6 @@ MenuItemImage* GameScene::closeButtonInit(){
     return button;
 }
 
-
 cocos2d::MenuItemImage* GameScene::createPlayButton(Wheel* theWheel ,std::string ImageFileName) {
 
     auto visibleSize = Director::getInstance()->getVisibleSize();
@@ -75,7 +74,26 @@ bool GameScene::init()
     /////////////////////////////
     auto closeItem = this->closeButtonInit();
 
-    Wheel* w = WheelMaker::createWheel(WHEEL_ITEM_RADIUS, IMG_WHEEL, IMG_WHEEL_ARROW,IMG_WHEEL_BORDER);
+
+    /*
+     * Creating item list here in GameScene, more items may be added here by pushing back to this list
+     * Definitions for different ItemDrops have been added to the ItemDrop class.
+     * Items can be created by passing the Amount and the Drop Rate of the ItemDrop.
+     */
+    vector<ItemDrop*> items;
+    items.push_back(ItemDrop::createLife(AMT_SEC_1, RATE_LIFE_X30));
+    items.push_back(ItemDrop::createBrushes(AMT_SEC_2, RATE_BRUSH_X3));
+    items.push_back(ItemDrop::createGems(AMT_SEC_3,RATE_GEMS_X35));
+    items.push_back(ItemDrop::createHammers(AMT_SEC_4,RATE_HAMMER_X3));
+    items.push_back(ItemDrop::createCoins(AMT_SEC_5,RATE_COINS_X750));
+    items.push_back(ItemDrop::createBrushes(AMT_SEC_6, RATE_BRUSH_X1));
+    items.push_back(ItemDrop::createGems(AMT_SEC_7, RATE_GEMS_X75));
+    items.push_back(ItemDrop::createHammers(AMT_SEC_8, RATE_HAMMER_X1));
+
+    /*
+     * Wheel can now be created by calling the Wheel::createWheel function and passing a vector of ItemDrop's.
+     */
+    Wheel* w = Wheel::createWheel(items);
     w->setScale(WHEEL_SCALE-0.2);
     this->addChild(w);
 
@@ -170,8 +188,11 @@ void GameScene::showUnitTests(Wheel* theWheel) {
     auto sceneObj = theWheel->getParent();
     Menu* devMenu = dynamic_cast<Menu *>(sceneObj->getChildByName(DEBUG_TAG));
 
-    //if the UnitTestMenu is already showing, this will remove it
-    //otherwise the menu will be displayed
+    /*
+     * if the UnitTestMenu is already showing, this will remove it
+     * otherwise the menu will be displayed
+     */
+
     if(devMenu == nullptr) {
         devMenu = UnitTests::createMenu(theWheel);
         devMenu->setScale(0.5);

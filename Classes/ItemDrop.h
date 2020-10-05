@@ -16,29 +16,34 @@
 
 
 #include "cocos2d.h"
+#include "Definitions.h"
+#include<vector>
 #include<string>
-#include"Player.h"
+
 
 using namespace std;
 
 //ItemDrop class
 class ItemDrop : public cocos2d::Sprite{
 private:
-	string Name;
 	int Count;
 	double DropRate;
 
 
 public:
 	ItemDrop(string NameOfItem, int NumberOfItem, const string& ImageFile, double DropChance);
-	string getName();
 	int getCount();
 	double getDropRate();
-	
-	virtual bool use(Player player) =0;
 
 	void AnimateItem(cocos2d::Vec2 location);
-	void FadeOut(float duration);
+
+	//items to make
+	static ItemDrop* createGems(int amount, double chance);
+	static ItemDrop* createHammers(int amount, double chance);
+	static ItemDrop* createLife(int amount, double chance);
+	static ItemDrop* createCoins(int amount, double chance);
+	static ItemDrop* createBrushes(int amount, double chance);
+
 
 };
 

@@ -18,7 +18,6 @@ USING_NS_CC;
 Wheel::Wheel(std::string WheelImage, std::string Wheel_arrow, std::string Wheel_frame, vector<ItemDrop*> itemList, int item_radius){
 
     this->Arrow = Sprite::create(Wheel_arrow);
-   
     this->theWheel = Sprite::create(WheelImage);
     this->initWithFile(Wheel_frame);
     this->addChild(this->Arrow);
@@ -29,14 +28,10 @@ Wheel::Wheel(std::string WheelImage, std::string Wheel_arrow, std::string Wheel_
     this->ItemDropList = itemList;
     this->NumberOfSectors = itemList.size();
     this->ItemRadius = item_radius;
-	//Null_Item is added to the back of list doesn't add an additional sector.
-    this->ItemDropList.push_back(new Null_Item());
-}
+    this->currentSector = 0;
+    this->placeItemsAroundWheel(this);
 
 
-Wheel::Wheel() {
-    this->ItemDropList.push_back( new Null_Item() );
-    this->currentSector=this->ItemDropList.size()-1;
 }
 
 vector<ItemDrop*> Wheel::getItemDropList() {
@@ -71,7 +66,7 @@ void Wheel::setCurrentSector(int s) {
     if(s < this->getNumberOfSectors() && s >= 0) {
         this->currentSector = s;
     }else{//fallsafe for out of bounds sectors
-        this->currentSector = this->ItemDropList.size()-1;
+        this->currentSector = 0;
     }
 }
 
@@ -89,9 +84,13 @@ ItemDrop* Wheel::AnimateWheel(){
     //reset wheel position before animating
     this->setRotation(0.0);
 	
-	//Animation are created by using 5 different RotateBy actions to make will spin at varying speeds.
-	//However this makes movement very jerky on screen.
-	//I think a more elegant solution can be found by using the cocos2d Physics objects
+	/*
+	 * Animation are created by using 5 different RotateBy actions to make will spin at varying speeds.
+	 * However this makes movement very jerky on screen.
+	 *
+	 * I would like to know how to better create a spinning animation, I think using Cocos Physics objects would be better
+	 * or using the update() function could some how be used to update the speed of the spin.
+	*/
     auto startSpin = RotateBy::create(1.0,360);
     auto slowSpin = RotateBy::create(1.75, 360);
     float spinTime = (rotation*2)/150.0;
@@ -100,7 +99,7 @@ ItemDrop* Wheel::AnimateWheel(){
     auto revBounce = RotateBy::create(0.4, -WHEEL_BOUNCE_END);
 
     auto fadeWheelOut = CallFunc::create([this]() {
-		//FadeOut actions are given to each item except for the "prize" item so that it can be shown on screen.
+
         ItemDrop* prize = this->getItem(this->getCurrentSector());
 
         auto fadeAction = FadeOut::create(0.5);
@@ -111,6 +110,11 @@ ItemDrop* Wheel::AnimateWheel(){
 
         prize->AnimateItem( this->getCenterOfWheel() );
 
+        /*
+         * FadeOut actions are given to each item except for the "prize" item so that it can be shown on screen.
+         * This ultimately undermines the purpose of the cascadeOpacityEnabled option to quickly fade out an object with all of it's child objects.
+         * I use this loop because I cannot find an good solution that allows me to keep the prize item on screen.
+         */
         int index = 0;
         for(ItemDrop* item: this->getItemDropList()){
             if(index++!=this->getCurrentSector())
@@ -137,21 +141,26 @@ int Wheel::getCurrentSector() {
 
 ItemDrop *Wheel::getItem(int Sector) {
 
-	//if sector is out of bounds, the Null_Item will be returned
-    if(Sector >= this->ItemDropList.size()-1 || Sector < 0)
-        return this->ItemDropList[this->ItemDropList.size()-1];
+	//if sector is out of bounds, the first item will be returned
+    if(Sector >= this->ItemDropList.size() || Sector < 0)
+        return this->ItemDropList[0];
 
     return this->ItemDropList[Sector];
 }
 
-//this function is called when player presses play button.
-//A boolean value is passed to decided if animation is played or not
-//when testing 1000 spins, a false value is passed to skip all animations
+
+/*
+ * this function is called when player presses play button.
+ * A boolean value is passed to decided if animation is played or not
+ * when testing 1000 spins, a false value is passed to skip all animations
+ */
 ItemDrop *Wheel::spin(bool playAnimation) {
     int sector = -1;
 
-	//total item drop rates are added to implement dynamic wheel sizes
-	//total is used to get a random value between 1 and total
+	/*
+	 * total item drop rates are added to implement dynamic wheel sizes
+	 * total is used to get a random value between 1 and total
+	 */
     int total = 0;
     for(ItemDrop* item : this->ItemDropList){
         total += item->getDropRate();
@@ -159,10 +168,11 @@ ItemDrop *Wheel::spin(bool playAnimation) {
 
     int rand = cocos2d::RandomHelper::random_int(1, total);
     total = 0;
-	
-	//This loop adds drop rates until a middle value is found.
-	//Which ever item's drop rate breaks the loop, is the item that the player wins
-	//This loop allows for varying numbers of items/sectors per wheel.
+	/*
+	 * This loop adds drop rates until a middle value is found.
+	 * Which ever item's drop rate breaks the loop, is the item that the player wins
+	 * This loop allows for varying numbers of items/sectors per wheel.
+	 */
     for(ItemDrop* item : this->ItemDropList){
         sector++;
         int lower = total;
@@ -180,6 +190,41 @@ ItemDrop *Wheel::spin(bool playAnimation) {
     return this->ItemDropList[this->getCurrentSector()];
 }
 
+Wheel *Wheel::createWheel(vector<ItemDrop*> ItemList) {
+    return new Wheel(IMG_WHEEL, IMG_WHEEL_ARROW, IMG_WHEEL_BORDER, ItemList, WHEEL_ITEM_RADIUS);
+}
+
+double Wheel::calculateSectorRotation(Wheel *theWheel, int sector) {
+    float sectorSpace = 360.0/theWheel->getNumberOfSectors();
+    float sectorOffset = sectorSpace/2.0;
+
+    return ( sectorSpace*sector ) + sectorOffset + ROTATION_OFFSET;
+}
+
+void Wheel::placeItemsAroundWheel(Wheel *theWheel) {
+
+    auto visibleSize = Director::getInstance()->getVisibleSize();
+    Vec2 origin = Director::getInstance()->getVisibleOrigin();
+    Vec2 centerScreen = Vec2(visibleSize.width/2 + origin.x, visibleSize.height/2 + origin.y);
+    theWheel->setPosition(  centerScreen  );
+
+    Vec2 centerWheel = theWheel->getCenterOfWheel();
+    float rad = theWheel->getItemRadius();
+    vector<ItemDrop*> itemList = theWheel->getItemDropList();
+
+    //set item positions around wheel
+    for( int sector = 0;  sector < theWheel->getNumberOfSectors();  sector++ ){
+
+        theWheel->getWheelSprite()->addChild(  itemList[ sector ]  );
+
+        float theta = calculateSectorRotation(theWheel, sector);
+        itemList[ sector ]->setRotation( -theta + ROTATION_OFFSET );
+        itemList[ sector ]->setPosition(Vec2(( rad*std::cos(theta*PI/180) ) + centerWheel.x,
+                                             ( rad * std::sin(theta*PI/180 ) )+centerWheel.y));
+
+    }
+
+}
 
 
 
